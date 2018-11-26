@@ -40,7 +40,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     List<Users> listdata;
     DatabaseReference mRef;
     Object checkedItem;
-    long calenderDate;
+
+
 
     public RecyclerviewAdapter(List<Users> listdata) {
 
@@ -93,9 +94,11 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
                         "نصف شهر","1 شهر", "3 أشهر", "6 أشهر", "1 عام"
                 };
 
-                builder.setView(inflater.inflate(R.layout.update_dialog, null));
+                final View mainView = inflater.inflate(R.layout.update_dialog, null);
+                builder.setView(mainView);
                 builder.setTitle("تجديد أشتراك " + data.getName());
-                builder.setSingleChoiceItems(membershipTypes, 0, new DialogInterface.OnClickListener() {
+                checkedItem = "1 شهر";
+                builder.setSingleChoiceItems(membershipTypes, 1, new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface d, int n) {
@@ -103,18 +106,41 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
                         ListView lw = ((AlertDialog)d).getListView();
                         checkedItem = lw.getAdapter().getItem(lw.getCheckedItemPosition());
 
-                        mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(data.getKey());
-                        Map<String,Object> taskMap = new HashMap<String,Object>();
-
-                        taskMap.put("membership", checkedItem.toString());
-                        taskMap.put("startdate", dateFormatter(myViewHolder.calendarView.getDate(), "MM/dd/yyyy"));
-                        mRef.updateChildren(taskMap);
-                        Toast.makeText(context,  "تم تجديد الأشتراك ل"+data.getName()+" لمدة "+checkedItem.toString(), Toast.LENGTH_LONG).show();
-
                     }
 
 
 
+                });
+
+                builder.setPositiveButton("تجديد الأشتراك", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (checkedItem != null){
+                            mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(data.getKey());
+                            Map<String,Object> taskMap = new HashMap<String,Object>();
+
+                            CalendarView calendarView = (CalendarView) mainView.findViewById(R.id.calendarView2);
+
+                            taskMap.put("membership", checkedItem.toString());
+                            taskMap.put("startdate", dateFormatter(calendarView.getDate(), "MM/dd/yyyy"));
+                            mRef.updateChildren(taskMap);
+                            Toast.makeText(context,  " تم تجديد أشتراك "+data.getName()+" لمدة "+checkedItem.toString(), Toast.LENGTH_LONG).show();
+
+                        }else{
+
+                            Toast.makeText(context,  "لم يتم تحديد نظام الأشتراك", Toast.LENGTH_LONG).show();
+
+                        }
+
+                    }
+                });
+
+                builder.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
                 });
 
                 AlertDialog dialog = builder.create();
@@ -166,8 +192,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         TextView user_name, user_membership;
         ImageView user_status;
         Button updateBtn;
-        CalendarView calendarView;
-        Button updateCalenderBtn;
+
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -175,8 +200,6 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
             user_membership = (TextView) itemView.findViewById(R.id.user_membership);
             user_status = (ImageView) itemView.findViewById(R.id.user_status);
             updateBtn = itemView.findViewById(R.id.update_btn);
-            calendarView = (CalendarView) itemView.findViewById(R.id.calendarView2);
-            updateCalenderBtn = itemView.findViewById(R.id.button3);
 
         }
     }

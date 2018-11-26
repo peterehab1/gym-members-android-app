@@ -12,51 +12,44 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import static com.example.peter.basic_app.HomeActivity.dateFormatter;
 
 public class AddActivity extends AppCompatActivity {
 
-    Spinner spn;
     CalendarView startDate;
-    CalendarView endDate;
+
     Button saveBtn;
     EditText theName;
     DatabaseReference mDatabaseRef;
-    String thestartdate;
-    String theenddate;
+    RadioGroup radioGroup;
+    RadioButton radioButton1;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         Button backBtn = (Button) findViewById(R.id.back_btn);
-        String[] membershipTypes = new String[] {
-                "نصف شهر","1 شهر", "3 أشهر", "6 أشهر", "1 عام"
-        };
 
-        spn = (Spinner) findViewById(R.id.spn);
+
         saveBtn = (Button) findViewById(R.id.save_btn);
         startDate = (CalendarView) findViewById(R.id.start_date);
         theName = (EditText) findViewById(R.id.the_name);
+
+        radioGroup = findViewById(R.id.radio_group);
+        radioButton1 = findViewById(R.id.radioButton_1);
+
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, membershipTypes);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spn.setAdapter(adapter);
-        spn.setSelection(adapter.getPosition("1 شهر"));
+
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
@@ -64,15 +57,25 @@ public class AddActivity extends AppCompatActivity {
             public void onClick(View v) {
 
                 final Users user = new Users();
+                // get selected radio button from radioGroup
+                int selectedId = radioGroup.getCheckedRadioButtonId();
+
+                // find the radiobutton by returned id
+                radioButton1 = (RadioButton) findViewById(selectedId);
+
+
                 if (theName.getText().toString().isEmpty()){
 
                     Toast.makeText(getApplicationContext(), "لا يمكن ترك حقل الأسم فارغ", Toast.LENGTH_LONG).show();
 
+                }else if(radioButton1 == null){
+
+                    Toast.makeText(getApplicationContext(), "برجاء أختيار نظام الأشتراك", Toast.LENGTH_LONG).show();
                 }else{
 
                     user.setName(theName.getText().toString());
-                    user.setMembership(spn.getSelectedItem().toString());
                     user.setStartdate(dateFormatter(startDate.getDate(), "MM/dd/yyyy"));
+                    user.setMembership((String) radioButton1.getText());
                     DatabaseReference newRef = mDatabaseRef.child("Users").push();
                     newRef.setValue(user);
                     Toast.makeText(getApplicationContext(), "تم الحفظ", Toast.LENGTH_LONG).show();

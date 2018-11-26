@@ -2,6 +2,7 @@ package com.example.peter.basic_app;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -21,11 +22,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -57,6 +61,9 @@ public class HomeActivity extends AppCompatActivity {
     private List<Users> list;
     private FloatingActionButton fab;
     private List<String> oneWeekLeftMembers;
+    private Button notificationsBtn;
+    private String[] myArray;
+
     String TAG = "getDate";
 
     @Override
@@ -66,12 +73,47 @@ public class HomeActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
+
+
         // initialise your views
         searchWord = (EditText) findViewById(R.id.search_word);
         searchList = (RecyclerView) findViewById(R.id.search_list);
         notificationCount = (TextView) findViewById(R.id.notf_count);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users");
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        notificationsBtn = findViewById(R.id.notifications_btn);
+
+
+        notificationsBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                builder.setIcon(R.drawable.ic_bad);
+                builder.setTitle("سينتهي الأشتراك خلال أسبوع");
+                builder.setNeutralButton("أغلاق", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+
+                builder.setItems(myArray, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
+
+            }
+        });
 
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -113,6 +155,7 @@ public class HomeActivity extends AppCompatActivity {
                 list = new ArrayList<>();
                 oneWeekLeftMembers = new ArrayList<>();
 
+
                 StringBuffer stringBuffer = new StringBuffer();
 
                 for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
@@ -135,7 +178,7 @@ public class HomeActivity extends AppCompatActivity {
                     long diff = getDateDiff(date1, date2);
 
                    if(diff >= 22 && diff < 30){
-                       oneWeekLeftMembers.add(dataSnapshot1.getKey());
+                       oneWeekLeftMembers.add(users.getName());
                     }
 
                     usersList.setName(name);
@@ -167,6 +210,9 @@ public class HomeActivity extends AppCompatActivity {
                 searchList.setItemAnimator( new DefaultItemAnimator());
                 searchList.setAdapter(recyclerviewAdapter);
 
+                myArray = new String[oneWeekLeftMembers.size()];
+                oneWeekLeftMembers.toArray(myArray);
+
             }
 
             @Override
@@ -174,7 +220,10 @@ public class HomeActivity extends AppCompatActivity {
 
             }
         });
+
     }
+
+
 
     public void searchForUser(String searchWord){
         Query firebaseQuery = mDatabaseRef.orderByChild("name").startAt(searchWord).endAt(searchWord + "\uf8ff");
