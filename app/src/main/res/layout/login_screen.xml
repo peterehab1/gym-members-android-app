@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="match_parent"
+        android:layout_height="413dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginStart="0dp"
+        android:layout_marginLeft="0dp"
+        app:srcCompat="@color/colorPrimary" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="166dp"
+        app:srcCompat="@drawable/dumbbell" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/google_signin_btn"
+        android:layout_alignBottom="@+id/imageView3"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="27dp"
+        android:layout_marginBottom="-64dp"
+        android:text="من فضلك قم بتسجيل الدخول "
+        android:textColor="@android:color/darker_gray"
+        android:textIsSelectable="true" />
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/google_signin_btn"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="393dp"
+        android:layout_marginEnd="54dp"
+        android:layout_marginRight="54dp">
+
+    </com.google.android.gms.common.SignInButton>
+
+</RelativeLayout>
