@@ -1,15 +1,10 @@
 package com.example.peter.basic_app;
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -18,16 +13,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -38,18 +26,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.net.NoRouteToHostException;
-import java.security.Timestamp;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import io.opencensus.tags.Tag;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -57,12 +38,21 @@ public class HomeActivity extends AppCompatActivity {
     private EditText searchWord;
     private RecyclerView searchList;
     private DatabaseReference mDatabaseRef;
-    private TextView notificationCount;
+
+    private TextView warningsCount;
+    private TextView errorsCount;
+
     private List<Users> list;
     private FloatingActionButton fab;
+
     private List<String> oneWeekLeftMembers;
-    private Button notificationsBtn;
-    private String[] myArray;
+    private List<String> noWeekLeftMembers;
+
+    private Button warningsBtn;
+    private Button errorBtn;
+
+    private String[] myArrayForWarnings;
+    private String[] myArrayForErrors;
 
     String TAG = "getDate";
 
@@ -78,13 +68,16 @@ public class HomeActivity extends AppCompatActivity {
         // initialise your views
         searchWord = (EditText) findViewById(R.id.search_word);
         searchList = (RecyclerView) findViewById(R.id.search_list);
-        notificationCount = (TextView) findViewById(R.id.notf_count);
+        warningsCount = (TextView) findViewById(R.id.warnings_count);
+        errorsCount = findViewById(R.id.errors_count);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users");
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        notificationsBtn = findViewById(R.id.notifications_btn);
+
+        warningsBtn = findViewById(R.id.warnings_btn);
+        errorBtn = findViewById(R.id.errors_btn);
 
 
-        notificationsBtn.setOnClickListener(new View.OnClickListener() {
+        warningsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
@@ -99,7 +92,38 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-                builder.setItems(myArray, new DialogInterface.OnClickListener() {
+                builder.setItems(myArrayForWarnings, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // The 'which' argument contains the index position
+                        // of the selected item
+
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+
+
+            }
+        });
+
+        errorBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                builder.setIcon(R.drawable.ic_bad);
+                builder.setTitle("أنتهي أشتراك الأعضاء التاليين");
+                builder.setNeutralButton("أغلاق", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+
+
+                builder.setItems(myArrayForErrors, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
@@ -154,6 +178,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 list = new ArrayList<>();
                 oneWeekLeftMembers = new ArrayList<>();
+                noWeekLeftMembers = new ArrayList<>();
 
 
                 StringBuffer stringBuffer = new StringBuffer();
@@ -161,13 +186,11 @@ public class HomeActivity extends AppCompatActivity {
                 for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
                     Users users = dataSnapshot1.getValue(Users.class);
                     Users usersList = new Users();
-                    Users oneWeekMembers = new Users();
 
                     String name = users.getName();
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
                     String key = dataSnapshot1.getKey();
-
 
                     String startDate = users.getStartdate();
                     String todayDate = dateFormatter(System.currentTimeMillis(), "MM/dd/yyyy");
@@ -177,9 +200,7 @@ public class HomeActivity extends AppCompatActivity {
 
                     long diff = getDateDiff(date1, date2);
 
-                   if(diff >= 22 && diff < 30){
-                       oneWeekLeftMembers.add(users.getName());
-                    }
+                    addToNotifications(diff, users.getMembership(),users.getName(), oneWeekLeftMembers, noWeekLeftMembers);
 
                     usersList.setName(name);
                     usersList.setMembership(membership);
@@ -195,9 +216,15 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
                 if (oneWeekLeftMembers.size() > 0){
-                    notificationCount.setText(String.valueOf(oneWeekLeftMembers.size()));
+                    warningsCount.setText(String.valueOf(oneWeekLeftMembers.size()));
                 }else{
-                    notificationCount.setText("");
+                    warningsCount.setText("");
+                }
+
+                if (noWeekLeftMembers.size() > 0){
+                    errorsCount.setText(String.valueOf(noWeekLeftMembers.size()));
+                }else{
+                    errorsCount.setText("");
                 }
 
 
@@ -210,8 +237,11 @@ public class HomeActivity extends AppCompatActivity {
                 searchList.setItemAnimator( new DefaultItemAnimator());
                 searchList.setAdapter(recyclerviewAdapter);
 
-                myArray = new String[oneWeekLeftMembers.size()];
-                oneWeekLeftMembers.toArray(myArray);
+                myArrayForWarnings = new String[oneWeekLeftMembers.size()];
+                oneWeekLeftMembers.toArray(myArrayForWarnings);
+
+                myArrayForErrors = new String[noWeekLeftMembers.size()];
+                noWeekLeftMembers.toArray(myArrayForErrors);
 
             }
 
@@ -222,7 +252,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     public void searchForUser(String searchWord){
@@ -299,6 +328,136 @@ public class HomeActivity extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(milliSeconds);
         return formatter.format(calendar.getTime());
+    }
+
+    public static String setMembershipForFirebaseDatabase(String startingDate){
+
+        String i = "30";
+
+        if (startingDate.matches("1 شهر")){
+            i = "30";
+            return i;
+        }else if (startingDate.matches("3 أشهر")){
+            i = "90";
+            return i;
+        }else if (startingDate.matches("6 أشهر")){
+            i = "180";
+            return i;
+        }else if (startingDate.matches("عام واحد")){
+            i = "360";
+            return i;
+        }else if (startingDate.matches("نصف  شهر")){
+            i = "15";
+            return i;
+        }
+
+        return i;
+
+    }
+
+    public static int check(long diff, String membership){
+
+        int error = R.drawable.ic_error;
+        int warning = R.drawable.ic_warning;
+        int verify = R.drawable.ic_verified;
+
+        if (membership.matches("30")){
+            if (diff >= 30){
+               return error;
+            }else if(diff >= 22 && diff < 30){
+                return warning;
+            }else{
+                return verify;
+            }
+
+        }else if (membership.matches("90")){
+            if (diff >= 90){
+                return error;
+            }else if(diff >= 82 && diff < 90){
+                return warning;
+            }else{
+                return verify;
+            }
+        }
+
+        else if (membership.matches("180")){
+            if (diff >= 180){
+                return error;
+            }else if(diff >= 172 && diff < 180){
+                return warning;
+            }else{
+                return verify;
+            }
+        }
+
+        else if (membership.matches("360")){
+            if (diff >= 360){
+                return error;
+            }else if(diff >= 352 && diff < 360){
+                return warning;
+            }else{
+                return verify;
+            }
+        }
+
+        else if (membership.matches("15")){
+            if (diff >= 15){
+                return error;
+            }else if(diff >= 8 && diff < 15){
+                return warning;
+            }else{
+                return verify;
+            }
+        }
+
+        return verify;
+    }
+
+    public void addToNotifications(long diff, String membership, String name, List<String> oneWeek, List<String> noWeeks){
+
+        if (membership.matches("30")){
+
+            if(diff >= 22 && diff < 30){
+                oneWeek.add(name);
+            }else if(diff >= 30){
+                noWeeks.add(name);
+            }
+
+        }else if (membership.matches("90")){
+
+            if(diff >= 82 && diff < 90){
+                oneWeek.add(name);
+            }else if(diff >= 90){
+                noWeeks.add(name);
+            }
+        }
+
+        else if (membership.matches("180")){
+            if(diff >= 172 && diff < 180){
+                oneWeek.add(name);
+            }else if(diff >= 180){
+                noWeeks.add(name);
+            }
+        }
+
+        else if (membership.matches("360")){
+
+            if(diff >= 352 && diff < 360){
+                oneWeek.add(name);
+            }else if(diff >= 360){
+                noWeeks.add(name);
+            }
+        }
+
+        else if (membership.matches("15")){
+
+            if(diff >= 8 && diff < 15){
+                oneWeek.add(name);
+            }else if(diff >= 15){
+                noWeeks.add(name);
+            }
+        }
+
     }
 
 

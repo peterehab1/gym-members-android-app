@@ -32,8 +32,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.peter.basic_app.AddActivity.*;
+import static com.example.peter.basic_app.HomeActivity.check;
 import static com.example.peter.basic_app.HomeActivity.dateFormatter;
 import static com.example.peter.basic_app.HomeActivity.getDateDiff;
+import static com.example.peter.basic_app.HomeActivity.setMembershipForFirebaseDatabase;
 
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.MyViewHolder> {
 
@@ -71,14 +73,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         Date date2 = new Date(todayDate);
 
         long diff = getDateDiff(date1, date2);
+        myViewHolder.user_status.setImageResource(check(diff, data.getMembership()));
 
-        if (diff >= 30){
-            myViewHolder.user_status.setImageResource(R.drawable.ic_error);
-        }else if(diff >= 22 && diff < 30){
-            myViewHolder.user_status.setImageResource(R.drawable.ic_warning);
-        }else{
-            myViewHolder.user_status.setImageResource(R.drawable.ic_verified);
-        }
 
         myViewHolder.updateBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,7 +87,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
 
                 String[] membershipTypes = new String[] {
-                        "نصف شهر","1 شهر", "3 أشهر", "6 أشهر", "1 عام"
+                        "نصف  شهر","1 شهر", "3 أشهر", "6 أشهر", "عام واحد"
                 };
 
                 final View mainView = inflater.inflate(R.layout.update_dialog, null);
@@ -122,7 +118,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
                             CalendarView calendarView = (CalendarView) mainView.findViewById(R.id.calendarView2);
 
-                            taskMap.put("membership", checkedItem.toString());
+                            taskMap.put("membership", setMembershipForFirebaseDatabase(checkedItem.toString()));
                             taskMap.put("startdate", dateFormatter(calendarView.getDate(), "MM/dd/yyyy"));
                             mRef.updateChildren(taskMap);
                             Toast.makeText(context,  " تم تجديد أشتراك "+data.getName()+" لمدة "+checkedItem.toString(), Toast.LENGTH_LONG).show();

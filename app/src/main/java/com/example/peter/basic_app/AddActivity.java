@@ -21,6 +21,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import static com.example.peter.basic_app.HomeActivity.dateFormatter;
+import static com.example.peter.basic_app.HomeActivity.setMembershipForFirebaseDatabase;
 
 public class AddActivity extends AppCompatActivity {
 
@@ -75,7 +76,7 @@ public class AddActivity extends AppCompatActivity {
 
                     user.setName(theName.getText().toString());
                     user.setStartdate(dateFormatter(startDate.getDate(), "MM/dd/yyyy"));
-                    user.setMembership((String) radioButton1.getText());
+                    user.setMembership(setMembershipForFirebaseDatabase(String.valueOf(radioButton1.getText())));
                     DatabaseReference newRef = mDatabaseRef.child("Users").push();
                     newRef.setValue(user);
                     Toast.makeText(getApplicationContext(), "تم الحفظ", Toast.LENGTH_LONG).show();
