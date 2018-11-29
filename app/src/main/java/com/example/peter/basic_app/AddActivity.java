@@ -56,6 +56,8 @@ public class AddActivity extends AppCompatActivity {
         radioGroup = findViewById(R.id.radio_group);
         radioButton1 = findViewById(R.id.radioButton_1);
 
+
+
         mDatabaseRef = FirebaseDatabase.getInstance().getReference();
 
 
