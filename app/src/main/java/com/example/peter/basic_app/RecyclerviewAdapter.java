@@ -35,6 +35,7 @@ import static com.example.peter.basic_app.AddActivity.*;
 import static com.example.peter.basic_app.HomeActivity.check;
 import static com.example.peter.basic_app.HomeActivity.dateFormatter;
 import static com.example.peter.basic_app.HomeActivity.getDateDiff;
+import static com.example.peter.basic_app.HomeActivity.getMembershipFromFirebaseDatabase;
 import static com.example.peter.basic_app.HomeActivity.setMembershipForFirebaseDatabase;
 
 public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapter.MyViewHolder> {
@@ -62,7 +63,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     public void onBindViewHolder(@NonNull final RecyclerviewAdapter.MyViewHolder myViewHolder, int i) {
         final Users data = listdata.get(i);
         myViewHolder.user_name.setText(data.getName());
-        myViewHolder.user_membership.setText(data.getMembership());
+        myViewHolder.user_membership.setText(" نظام الأشتراك : " + getMembershipFromFirebaseDatabase(data.getMembership()));
 
 
 
@@ -72,8 +73,15 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         Date date1 = new Date(startDate); //  Month/Day/Year
         Date date2 = new Date(todayDate);
 
-        long diff = getDateDiff(date1, date2);
+        final long diff = getDateDiff(date1, date2);
         myViewHolder.user_status.setImageResource(check(diff, data.getMembership()));
+
+        myViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), data.getName() +" مشترك منذ "+ String.valueOf(diff) + " يوم علي نظام " + getMembershipFromFirebaseDatabase(data.getMembership()), Toast.LENGTH_LONG).show();
+            }
+        });
 
 
         myViewHolder.updateBtn.setOnClickListener(new View.OnClickListener() {

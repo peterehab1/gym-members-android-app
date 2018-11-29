@@ -8,6 +8,44 @@
     android:focusableInTouchMode="true"
     tools:context=".HomeActivity">
 
+    <Button
+        android:id="@+id/clear_btn"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:background="@drawable/ic_remove"
+        app:layout_constraintBottom_toBottomOf="@+id/search_word"
+        app:layout_constraintEnd_toEndOf="@+id/search_word"
+        app:layout_constraintHorizontal_bias="0.076"
+        app:layout_constraintStart_toStartOf="@+id/search_word"
+        app:layout_constraintTop_toTopOf="@+id/search_word"
+        app:layout_constraintVertical_bias="0.541" />
+
+    <View
+        android:id="@+id/lil_view"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toTopOf="@+id/search_word"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+
+    <TextView
+        android:id="@+id/connection_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="4dp"
+        android:text="TextView"
+        android:textColor="@color/common_google_signin_btn_text_dark_default"
+        app:layout_constraintBottom_toBottomOf="@+id/lil_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/warnings_count"
@@ -24,7 +62,7 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toEndOf="@+id/warnings_btn"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.517" />
+        app:layout_constraintVertical_bias="0.755" />
 
     <EditText
         android:id="@+id/search_word"
@@ -32,11 +70,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:background="@drawable/search_layout"
         android:ems="10"
         android:focusable="auto"
-        android:hint="Type person name"
+        android:hint="أبحث بالأسم"
         android:inputType="textPersonName"
         android:padding="10dp"
         android:textSize="14sp"
@@ -48,43 +86,43 @@
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="68dp"
-        android:layout_marginRight="68dp"
+        android:layout_marginEnd="80dp"
+        android:layout_marginRight="80dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_error_grey"
         app:layout_constraintBottom_toTopOf="@+id/search_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.636" />
+        app:layout_constraintVertical_bias="0.842" />
 
     <TextView
         android:id="@+id/errors_count"
-        android:layout_width="14dp"
-        android:layout_height="17dp"
+        android:layout_width="17dp"
+        android:layout_height="16dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="52dp"
-        android:layout_marginRight="52dp"
+        android:layout_marginEnd="60dp"
+        android:layout_marginRight="60dp"
         android:layout_marginBottom="8dp"
         android:text="0"
         android:textColor="@color/colorAccent"
         app:layout_constraintBottom_toTopOf="@+id/search_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.533" />
+        app:layout_constraintVertical_bias="0.723" />
 
     <Button
         android:id="@+id/warnings_btn"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/ic_warning_grey"
         app:layout_constraintBottom_toTopOf="@+id/search_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.636" />
+        app:layout_constraintVertical_bias="0.842" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/search_list"
@@ -95,7 +133,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search_word" />
+        app:layout_constraintTop_toBottomOf="@+id/search_word"
+        app:layout_constraintVertical_bias="0.0" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -106,7 +145,7 @@
         android:layout_marginLeft="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
-        android:layout_marginBottom="28dp"
+        android:layout_marginBottom="16dp"
         android:src="@drawable/ic_add"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"

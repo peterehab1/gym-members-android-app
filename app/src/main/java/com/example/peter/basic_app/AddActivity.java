@@ -3,6 +3,7 @@ package com.example.peter.basic_app;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -17,8 +18,15 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import static com.example.peter.basic_app.HomeActivity.dateFormatter;
 import static com.example.peter.basic_app.HomeActivity.setMembershipForFirebaseDatabase;
@@ -26,12 +34,12 @@ import static com.example.peter.basic_app.HomeActivity.setMembershipForFirebaseD
 public class AddActivity extends AppCompatActivity {
 
     CalendarView startDate;
-
     Button saveBtn;
     EditText theName;
     DatabaseReference mDatabaseRef;
     RadioGroup radioGroup;
     RadioButton radioButton1;
+    public static ArrayList<String> eventsCountlist;
 
 
     @Override
@@ -74,13 +82,34 @@ public class AddActivity extends AppCompatActivity {
                     Toast.makeText(getApplicationContext(), "برجاء أختيار نظام الأشتراك", Toast.LENGTH_LONG).show();
                 }else{
 
-                    user.setName(theName.getText().toString());
-                    user.setStartdate(dateFormatter(startDate.getDate(), "MM/dd/yyyy"));
-                    user.setMembership(setMembershipForFirebaseDatabase(String.valueOf(radioButton1.getText())));
-                    DatabaseReference newRef = mDatabaseRef.child("Users").push();
-                    newRef.setValue(user);
-                    Toast.makeText(getApplicationContext(), "تم الحفظ", Toast.LENGTH_LONG).show();
-                    finish();
+                    //Check if name is there before
+                    Query firebaseQuery = mDatabaseRef.child("Users").orderByChild("name").startAt(theName.getText().toString()).endAt(theName.getText().toString() + "\uf8ff");
+                    firebaseQuery.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.getChildrenCount() <= 0){
+                                user.setName(theName.getText().toString());
+                                user.setStartdate(dateFormatter(startDate.getDate(), "MM/dd/yyyy"));
+                                user.setMembership(setMembershipForFirebaseDatabase(String.valueOf(radioButton1.getText())));
+                                DatabaseReference newRef = mDatabaseRef.child("Users").push();
+                                newRef.setValue(user);
+
+
+                                Toast.makeText(getApplicationContext(), "تم الحفظ", Toast.LENGTH_LONG).show();
+                                finish();
+                            }else{
+
+                                Toast.makeText(getApplicationContext(), "موجود مسبقاً", Toast.LENGTH_LONG).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                        }
+                    });
+
+
                 }
 
             }
@@ -94,6 +123,7 @@ public class AddActivity extends AppCompatActivity {
             }
         });
     }
+
 
 
 }

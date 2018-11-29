@@ -3,11 +3,14 @@ package com.example.peter.basic_app;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -41,9 +44,11 @@ public class HomeActivity extends AppCompatActivity {
 
     private TextView warningsCount;
     private TextView errorsCount;
-
     private List<Users> list;
     private FloatingActionButton fab;
+
+    private View lilView;
+    private TextView connectionStatus;
 
     private List<String> oneWeekLeftMembers;
     private List<String> noWeekLeftMembers;
@@ -53,6 +58,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private String[] myArrayForWarnings;
     private String[] myArrayForErrors;
+
+    private Button clearBtn;
 
     String TAG = "getDate";
 
@@ -73,8 +80,39 @@ public class HomeActivity extends AppCompatActivity {
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users");
         fab = (FloatingActionButton) findViewById(R.id.fab);
 
+        clearBtn = findViewById(R.id.clear_btn);
+        clearBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchWord.setText("");
+            }
+        });
+
+        lilView = findViewById(R.id.lil_view);
+        connectionStatus = findViewById(R.id.connection_status);
+
         warningsBtn = findViewById(R.id.warnings_btn);
         errorBtn = findViewById(R.id.errors_btn);
+
+        DatabaseReference connectedRef = FirebaseDatabase.getInstance().getReference(".info/connected");
+        connectedRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                boolean connected = snapshot.getValue(Boolean.class);
+                if (connected) {
+                    lilView.setBackgroundColor(0xFF4caf50);
+                    connectionStatus.setText("متصل بالأنترنت");
+                } else {
+                    lilView.setBackgroundColor(0xFFDF0A00);
+                    connectionStatus.setText("غير متصل بالأنترنت" );
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                System.err.println("Listener was cancelled");
+            }
+        });
 
 
         warningsBtn.setOnClickListener(new View.OnClickListener() {
@@ -355,6 +393,30 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public static String getMembershipFromFirebaseDatabase(String mem){
+
+        String i = "مكان نص";
+
+        if (mem.matches("30")){
+            i = "1 شهر";
+            return i;
+        }else if (mem.matches("90")){
+            i = "3 أشهر";
+            return i;
+        }else if (mem.matches("180")){
+            i = "6 أشهر";
+            return i;
+        }else if (mem.matches("360")){
+            i = "عام واحد";
+            return i;
+        }else if (mem.matches("15")){
+            i = "نصف  شهر";
+            return i;
+        }
+
+        return i;
+    }
+
     public static int check(long diff, String membership){
 
         int error = R.drawable.ic_error;
@@ -459,6 +521,4 @@ public class HomeActivity extends AppCompatActivity {
         }
 
     }
-
-
 }
