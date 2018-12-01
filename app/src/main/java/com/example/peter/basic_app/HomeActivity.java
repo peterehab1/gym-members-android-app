@@ -256,13 +256,13 @@ public class HomeActivity extends AppCompatActivity {
                 if (oneWeekLeftMembers.size() > 0){
                     warningsCount.setText(String.valueOf(oneWeekLeftMembers.size()));
                 }else{
-                    warningsCount.setText("");
+                    warningsCount.setText("0");
                 }
 
                 if (noWeekLeftMembers.size() > 0){
                     errorsCount.setText(String.valueOf(noWeekLeftMembers.size()));
                 }else{
-                    errorsCount.setText("");
+                    errorsCount.setText("0");
                 }
 
 
