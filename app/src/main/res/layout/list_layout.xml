@@ -24,6 +24,16 @@
         android:layout_centerVertical="true"
         android:background="@drawable/ic_money" />
 
+    <Button
+        android:id="@+id/pay_left"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignTop="@+id/update_btn"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="3dp"
+        android:layout_toEndOf="@+id/update_btn"
+        android:background="@drawable/ic_payment" />
+
     <TextView
         android:id="@+id/user_name"
         android:layout_width="wrap_content"

@@ -228,6 +228,7 @@ public class HomeActivity extends AppCompatActivity {
                     String name = users.getName();
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
+                    String leftmoney = users.getLeftmoney();
                     String key = dataSnapshot1.getKey();
 
                     String startDate = users.getStartdate();
@@ -243,6 +244,7 @@ public class HomeActivity extends AppCompatActivity {
                     usersList.setName(name);
                     usersList.setMembership(membership);
                     usersList.setStartdate(startdate);
+                    usersList.setLeftmoney(leftmoney);
                     usersList.setKey(key);
 
 
@@ -312,11 +314,13 @@ public class HomeActivity extends AppCompatActivity {
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
                     String key = dataSnapshot1.getKey();
+                    String leftmoney = users.getLeftmoney();
 
                     usersList.setName(name);
                     usersList.setMembership(membership);
                     usersList.setStartdate(startdate);
                     usersList.setKey(key);
+                    usersList.setLeftmoney(leftmoney);
 
                     list.add(usersList);
 

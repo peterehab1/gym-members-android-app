@@ -1,8 +1,11 @@
 package com.example.peter.basic_app;
 
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
@@ -15,6 +18,8 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -43,6 +48,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     List<Users> listdata;
     DatabaseReference mRef;
     Object checkedItem;
+    String theFinalDate;
+    DatePickerDialog.OnDateSetListener chooseDate;
 
 
 
@@ -63,8 +70,11 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     public void onBindViewHolder(@NonNull final RecyclerviewAdapter.MyViewHolder myViewHolder, int i) {
         final Users data = listdata.get(i);
         myViewHolder.user_name.setText(data.getName());
-        myViewHolder.user_membership.setText(" نظام الأشتراك : " + getMembershipFromFirebaseDatabase(data.getMembership()));
-
+        if (data.getLeftmoney().matches("0")){
+            myViewHolder.user_membership.setText(" نظام الأشتراك : " + getMembershipFromFirebaseDatabase(data.getMembership()));
+        }else{
+            myViewHolder.user_membership.setText(" نظام الأشتراك : " + getMembershipFromFirebaseDatabase(data.getMembership()) + " - متبقي : " + String.valueOf(data.getLeftmoney()) + " جنيهاً ");
+        }
 
 
         String startDate = data.getStartdate();
@@ -79,7 +89,55 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         myViewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(v.getContext(), data.getName() +" مشترك منذ "+ String.valueOf(diff) + " يوم علي نظام " + getMembershipFromFirebaseDatabase(data.getMembership()), Toast.LENGTH_LONG).show();
+                if (diff <= 0){
+                    Toast.makeText(v.getContext(),  " لم يبدأ أشتراك " + "'"+data.getName()+"'" + " بعد ", Toast.LENGTH_LONG).show();
+                }else{
+                    Toast.makeText(v.getContext(), data.getName() +" مشترك منذ "+ String.valueOf(diff) + " يوم علي نظام " + getMembershipFromFirebaseDatabase(data.getMembership()), Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
+
+        myViewHolder.payLeftmoney.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (data.getLeftmoney().matches("0")){
+                    Toast.makeText(v.getContext(),  "لا يوجد باقي", Toast.LENGTH_SHORT).show();
+                }else{
+
+                    final Context context = v.getContext();
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                    LayoutInflater inflater = (LayoutInflater) context.getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+
+                    builder.setMessage(" تأكيد دفع العضو " + data.getName() + " لمبلغ " + data.getLeftmoney() + " جنيهاً ؟ ");
+                    builder.setTitle(" دفع باقي أشتراك ");
+
+                    builder.setPositiveButton("تجديد الأشتراك", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(data.getKey());
+                            Map<String,Object> taskMap = new HashMap<String,Object>();
+                            taskMap.put("leftmoney", "0");
+                            mRef.updateChildren(taskMap);
+                            Toast.makeText(context,  " تم دفع المتبقي ", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
+                    builder.setNegativeButton("الغاء", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+
+
+                }
             }
         });
 
@@ -124,10 +182,26 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
                             mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(data.getKey());
                             Map<String,Object> taskMap = new HashMap<String,Object>();
 
-                            CalendarView calendarView = (CalendarView) mainView.findViewById(R.id.calendarView2);
+                            //final TextView dateStartUpdate = mainView.findViewById(R.id.date_start_update);
+
+                            //CalendarView calendarView = (CalendarView) mainView.findViewById(R.id.calendarView2);
+                            EditText membershipLeftmoney = (EditText) mainView.findViewById(R.id.membership_left_money);
+
+                            if (membershipLeftmoney.getText().toString().isEmpty()){
+                                taskMap.put("leftmoney", "0");
+                            }else{
+                                taskMap.put("leftmoney", membershipLeftmoney.getText().toString());
+                            }
 
                             taskMap.put("membership", setMembershipForFirebaseDatabase(checkedItem.toString()));
-                            taskMap.put("startdate", dateFormatter(calendarView.getDate(), "MM/dd/yyyy"));
+
+                            Calendar cal = Calendar.getInstance();
+                            int year = cal.get(Calendar.YEAR);
+                            int month = cal.get(Calendar.MONTH);
+                            month = month + 1;
+                            int day = cal.get(Calendar.DAY_OF_MONTH);
+                            theFinalDate = month + "/" + day + "/" + year;
+                            taskMap.put("startdate", theFinalDate);
                             mRef.updateChildren(taskMap);
                             Toast.makeText(context,  " تم تجديد أشتراك "+data.getName()+" لمدة "+checkedItem.toString(), Toast.LENGTH_LONG).show();
 
@@ -196,6 +270,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         TextView user_name, user_membership;
         ImageView user_status;
         Button updateBtn;
+        Button payLeftmoney;
 
 
         public MyViewHolder(@NonNull View itemView) {
@@ -204,6 +279,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
             user_membership = (TextView) itemView.findViewById(R.id.user_membership);
             user_status = (ImageView) itemView.findViewById(R.id.user_status);
             updateBtn = itemView.findViewById(R.id.update_btn);
+            payLeftmoney = itemView.findViewById(R.id.pay_left);
 
         }
     }
