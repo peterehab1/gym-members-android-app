@@ -119,7 +119,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-                builder.setIcon(R.drawable.ic_bad);
+
                 builder.setTitle("سينتهي الأشتراك خلال أسبوع");
                 builder.setNeutralButton("أغلاق", new DialogInterface.OnClickListener() {
                     @Override
@@ -150,7 +150,7 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-                builder.setIcon(R.drawable.ic_bad);
+
                 builder.setTitle("أنتهي أشتراك الأعضاء التاليين");
                 builder.setNeutralButton("أغلاق", new DialogInterface.OnClickListener() {
                     @Override
@@ -228,7 +228,8 @@ public class HomeActivity extends AppCompatActivity {
                     String name = users.getName();
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
-                    String leftmoney = users.getLeftmoney();
+                    String image = users.getImage();
+                    //String notes = users.getNotes();
                     String key = dataSnapshot1.getKey();
 
                     String startDate = users.getStartdate();
@@ -244,8 +245,9 @@ public class HomeActivity extends AppCompatActivity {
                     usersList.setName(name);
                     usersList.setMembership(membership);
                     usersList.setStartdate(startdate);
-                    usersList.setLeftmoney(leftmoney);
+                    //usersList.setNotes(notes);
                     usersList.setKey(key);
+                    usersList.setImage(image);
 
 
                     //If date difference change image beside the name
@@ -268,7 +270,7 @@ public class HomeActivity extends AppCompatActivity {
                 }
 
 
-                RecyclerviewAdapter recyclerviewAdapter = new RecyclerviewAdapter(list);
+                RecyclerviewAdapter recyclerviewAdapter = new RecyclerviewAdapter(list, getApplicationContext());
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getApplicationContext());
                 recyclerviewAdapter.notifyDataSetChanged();
 
@@ -314,13 +316,15 @@ public class HomeActivity extends AppCompatActivity {
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
                     String key = dataSnapshot1.getKey();
-                    String leftmoney = users.getLeftmoney();
+                    //String notes = users.getNotes();
+                    String image = users.getImage();
 
                     usersList.setName(name);
                     usersList.setMembership(membership);
                     usersList.setStartdate(startdate);
+                    usersList.setImage(image);
                     usersList.setKey(key);
-                    usersList.setLeftmoney(leftmoney);
+                    //usersList.setNotes(notes);
 
                     list.add(usersList);
 
@@ -329,7 +333,7 @@ public class HomeActivity extends AppCompatActivity {
 
 
 
-                RecyclerviewAdapter recyclerviewAdapter = new RecyclerviewAdapter(list);
+                RecyclerviewAdapter recyclerviewAdapter = new RecyclerviewAdapter(list, getApplicationContext());
                 RecyclerView.LayoutManager layoutmanager = new LinearLayoutManager(getApplicationContext());
                 recyclerviewAdapter.notifyDataSetChanged();
 
@@ -423,7 +427,7 @@ public class HomeActivity extends AppCompatActivity {
 
     public static int check(long diff, String membership){
 
-        int error = R.drawable.ic_error;
+        int error = R.drawable.ic_err;
         int warning = R.drawable.ic_warning;
         int verify = R.drawable.ic_verified;
 

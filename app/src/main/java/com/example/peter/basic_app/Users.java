@@ -8,15 +8,17 @@ public class Users {
     String membership;
     String startdate;
     String key;
-    String leftmoney;
+    String notes;
+    String image;
 
 
-    public Users(String name, String membership, String startdate, String key, String leftmoney){
+    public Users(String name, String membership, String startdate, String key, String notes, String image){
         this.name = name;
         this.membership = membership;
         this.startdate = startdate;
         this.key = key;
-        this.leftmoney = leftmoney;
+        this.notes = notes;
+        this.image = image;
 
     }
 
@@ -56,11 +58,19 @@ public class Users {
         this.key = key;
     }
 
-    public String getLeftmoney(){
-        return leftmoney;
+    public String getNotes(){
+        return notes;
     }
 
-    public void setLeftmoney(String leftmoney) {
-        this.leftmoney = leftmoney;
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
+    public String getImage(){
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 }
