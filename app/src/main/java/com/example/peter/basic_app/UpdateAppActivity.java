@@ -36,9 +36,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static com.example.peter.basic_app.HomeActivity.updateLink;
-import static com.example.peter.basic_app.HomeActivity.updateVersion;
-
 public class UpdateAppActivity extends AppCompatActivity {
 
     DatabaseReference mRef;
@@ -47,12 +44,49 @@ public class UpdateAppActivity extends AppCompatActivity {
     Button updateAppBtn;
     Button backBtn;
 
+    static String updateLink;
+    static String updateVersion;
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_app);
+
+        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Versions");
+
+        //Check for updates
+        final DatabaseReference updatedAppLink = mRef.child("200").child("link");
+        DatabaseReference updatedAppVersion = mRef.child("200").child("version");
+
+
+        updatedAppLink.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                updateLink = dataSnapshot.getValue(String.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+        updatedAppVersion.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                updateVersion = dataSnapshot.getValue(String.class);
+                updateAppBtn.setText(updateVersion);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         //Font
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Questv1-Bold.otf");
@@ -88,7 +122,7 @@ public class UpdateAppActivity extends AppCompatActivity {
             }
         });
 
-        updateAppBtn.setText(updateVersion);
+
 
         versionText.setTypeface(typeface);
         versionNumber.setTypeface(typeface);

@@ -91,12 +91,7 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
         mUserAvatarURI = intent.getStringExtra("userAvatar");
         final ArrayList<String> listOfUsersNames = intent.getStringArrayListExtra("usersNamesArr");
 
-
-        if (mUserAvatarURI == null){
-            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/test-project-798ce.appspot.com/o/Unknown_avatar.png?alt=media&token=500511cf-4796-44b0-b6d6-142423b8a04b").fit().transform(new CircleTransform()).centerCrop().into(userAvatar);
-        }else{
-            Picasso.get().load(mUserAvatarURI).fit().transform(new CircleTransform()).centerCrop().into(userAvatar);
-        }
+        Picasso.get().load(mUserAvatarURI).fit().transform(new CircleTransform()).centerCrop().into(userAvatar);
 
         userName.setText(mUserName);
         usernameInTop.setText(mUserName);

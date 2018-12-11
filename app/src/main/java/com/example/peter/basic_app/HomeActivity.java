@@ -1,5 +1,7 @@
 package com.example.peter.basic_app;
 
+import android.app.ActivityManager;
+import android.content.ComponentCallbacks2;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +24,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseError;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,8 +38,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.google.common.base.Predicates.equalTo;
 
-public class HomeActivity extends AppCompatActivity {
+
+public class HomeActivity extends AppCompatActivity implements ComponentCallbacks2 {
 
     private EditText searchWord;
     private RecyclerView searchList;
@@ -62,10 +67,89 @@ public class HomeActivity extends AppCompatActivity {
 
     private Button clearBtn;
 
-    static String updateLink;
-    static String updateVersion;
+
+
 
     String TAG = "getDate";
+
+    /**
+     * Release memory when the UI becomes hidden or when system resources become low.
+     * @param level the memory-related event that was raised.
+     */
+    public void onTrimMemory(int level) {
+
+        // Determine which lifecycle or system event was raised.
+        switch (level) {
+
+            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
+
+                /*
+                   Release any UI objects that currently hold memory.
+
+                   The user interface has moved to the background.
+                */
+
+                break;
+
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
+
+                /*
+                   Release any memory that your app doesn't need to run.
+
+                   The device is running low on memory while the app is running.
+                   The event raised indicates the severity of the memory-related event.
+                   If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will
+                   begin killing background processes.
+                */
+
+                break;
+
+            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
+
+                /*
+                   Release as much memory as the process can.
+
+                   The app is on the LRU list and the system is running low on memory.
+                   The event raised indicates where the app sits within the LRU list.
+                   If the event is TRIM_MEMORY_COMPLETE, the process will be one of
+                   the first to be terminated.
+                */
+
+                break;
+
+            default:
+                /*
+                  Release any non-critical data structures.
+
+                  The app received an unrecognized memory level value
+                  from the system. Treat this as a generic low-memory message.
+                */
+                break;
+        }
+    }
+
+    public void doSomethingMemoryIntensive() {
+
+        // Before doing something that requires a lot of memory,
+        // check to see whether the device is in a low memory state.
+        ActivityManager.MemoryInfo memoryInfo = getAvailableMemory();
+
+        if (!memoryInfo.lowMemory) {
+            // Do memory intensive work ...
+        }
+    }
+
+    // Get a MemoryInfo object for the device's current memory status.
+    private ActivityManager.MemoryInfo getAvailableMemory() {
+        ActivityManager activityManager = (ActivityManager) this.getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(memoryInfo);
+        return memoryInfo;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,39 +157,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-
-        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Versions");
-
-        //Check for updates
-        final DatabaseReference updatedAppLink = mRef.child("200").child("link");
-        DatabaseReference updatedAppVersion = mRef.child("200").child("version");
-
-        updatedAppLink.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                updateLink = dataSnapshot.getValue(String.class);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-        updatedAppVersion.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                updateVersion = dataSnapshot.getValue(String.class);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-
 
 
         // initialise your views
@@ -175,7 +226,6 @@ public class HomeActivity extends AppCompatActivity {
                 });
 
 
-
                 builder.setItems(myArrayForWarnings, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
@@ -234,7 +284,6 @@ public class HomeActivity extends AppCompatActivity {
 
         getMyUsers();
 
-
         searchWord.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -252,10 +301,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
     }
-
-
 
     public void getMyUsers(){
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
@@ -267,6 +313,7 @@ public class HomeActivity extends AppCompatActivity {
                 noWeekLeftMembers = new ArrayList<>();
 
                 for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
+
                     Users users = dataSnapshot1.getValue(Users.class);
                     Users usersList = new Users();
 
@@ -575,4 +622,5 @@ public class HomeActivity extends AppCompatActivity {
         }
 
     }
+
 }

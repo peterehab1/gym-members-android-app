@@ -2,6 +2,7 @@ package com.example.peter.basic_app;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
+import android.content.ComponentCallbacks2;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -82,8 +83,69 @@ public class AddActivity extends AppCompatActivity {
     TextView ttextView;
     String defaultAvatar;
 
+    /**
+     * Release memory when the UI becomes hidden or when system resources become low.
+     * @param level the memory-related event that was raised.
+     */
+    public void onTrimMemory(int level) {
+
+        // Determine which lifecycle or system event was raised.
+        switch (level) {
+
+            case ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN:
+
+                /*
+                   Release any UI objects that currently hold memory.
+
+                   The user interface has moved to the background.
+                */
+
+                break;
+
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_LOW:
+            case ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL:
+
+                /*
+                   Release any memory that your app doesn't need to run.
+
+                   The device is running low on memory while the app is running.
+                   The event raised indicates the severity of the memory-related event.
+                   If the event is TRIM_MEMORY_RUNNING_CRITICAL, then the system will
+                   begin killing background processes.
+                */
+
+                break;
+
+            case ComponentCallbacks2.TRIM_MEMORY_BACKGROUND:
+            case ComponentCallbacks2.TRIM_MEMORY_MODERATE:
+            case ComponentCallbacks2.TRIM_MEMORY_COMPLETE:
+
+                /*
+                   Release as much memory as the process can.
+
+                   The app is on the LRU list and the system is running low on memory.
+                   The event raised indicates where the app sits within the LRU list.
+                   If the event is TRIM_MEMORY_COMPLETE, the process will be one of
+                   the first to be terminated.
+                */
+
+                break;
+
+            default:
+                /*
+                  Release any non-critical data structures.
+
+                  The app received an unrecognized memory level value
+                  from the system. Treat this as a generic low-memory message.
+                */
+                break;
+        }
+    }
+
 
     static final int CAMERA_REQUEST_CODE = 1;
+    static String avatarLink;
 
     int year;
     int month;
@@ -97,6 +159,22 @@ public class AddActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add);
         Button backBtn = (Button) findViewById(R.id.back_btn);
+
+        DatabaseReference mVersionsRef = FirebaseDatabase.getInstance().getReference().child("Versions");
+        DatabaseReference defaultAvatarLink = mVersionsRef.child("200").child("avatar");
+
+        defaultAvatarLink.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                avatarLink = dataSnapshot.getValue(String.class);
+                Picasso.get().load(avatarLink).fit().transform(new CircleTransform()).centerCrop().into(imageView);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         //Font
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Questv1-Bold.otf");
@@ -116,7 +194,6 @@ public class AddActivity extends AppCompatActivity {
         mProgressDialog = new ProgressDialog(this);
         imageView = (ImageView) findViewById(R.id.image_preview);
         ttextView = findViewById(R.id.ttextview);
-        defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/test-project-798ce.appspot.com/o/Unknown_avatar.png?alt=media&token=500511cf-4796-44b0-b6d6-142423b8a04b";
 
         theName.setTypeface(typeface);
         notes.setTypeface(typeface);
@@ -128,7 +205,6 @@ public class AddActivity extends AppCompatActivity {
         dateStartTextview.setTypeface(typeface);
         ttextView.setTypeface(typeface);
 
-        Picasso.get().load(defaultAvatar).fit().transform(new CircleTransform()).centerCrop().into(imageView);
 
         Calendar cal = Calendar.getInstance();
         final int year = cal.get(Calendar.YEAR);
@@ -302,8 +378,6 @@ public class AddActivity extends AppCompatActivity {
 
         }
     }
-
-
 
 }
 
