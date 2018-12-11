@@ -55,6 +55,8 @@ public class UpdateAppActivity extends AppCompatActivity {
         setContentView(R.layout.activity_update_app);
 
         DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Versions");
+        mRef.keepSynced(true);
+
 
         //Check for updates
         final DatabaseReference updatedAppLink = mRef.child("200").child("link");

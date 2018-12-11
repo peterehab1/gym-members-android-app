@@ -145,7 +145,6 @@ public class AddActivity extends AppCompatActivity {
 
 
     static final int CAMERA_REQUEST_CODE = 1;
-    static String avatarLink;
 
     int year;
     int month;
@@ -160,27 +159,11 @@ public class AddActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add);
         Button backBtn = (Button) findViewById(R.id.back_btn);
 
-        DatabaseReference mVersionsRef = FirebaseDatabase.getInstance().getReference().child("Versions");
-        DatabaseReference defaultAvatarLink = mVersionsRef.child("200").child("avatar");
-
-        defaultAvatarLink.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                avatarLink = dataSnapshot.getValue(String.class);
-                Picasso.get().load(avatarLink).fit().transform(new CircleTransform()).centerCrop().into(imageView);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
         //Font
         Typeface typeface = Typeface.createFromAsset(getAssets(), "fonts/Questv1-Bold.otf");
 
-        saveBtn = (Button) findViewById(R.id.save_btn);
-        theName = (EditText) findViewById(R.id.the_name);
+        saveBtn = findViewById(R.id.save_btn);
+        theName = findViewById(R.id.the_name);
         notes = findViewById(R.id.notes);
         radioGroup = findViewById(R.id.radio_group);
         radioButton1 = findViewById(R.id.radioButton_1);
@@ -192,7 +175,7 @@ public class AddActivity extends AppCompatActivity {
         mRef = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mProgressDialog = new ProgressDialog(this);
-        imageView = (ImageView) findViewById(R.id.image_preview);
+        imageView = findViewById(R.id.image_preview);
         ttextView = findViewById(R.id.ttextview);
 
         theName.setTypeface(typeface);
@@ -204,6 +187,9 @@ public class AddActivity extends AppCompatActivity {
         radioButton5.setTypeface(typeface);
         dateStartTextview.setTypeface(typeface);
         ttextView.setTypeface(typeface);
+
+        defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/test-project-798ce.appspot.com/o/Unknown_avatar.png?alt=media&token=53afd6d0-3a65-474a-9e90-27b208a2602a";
+        Picasso.get().load(defaultAvatar).fit().transform(new CircleTransform()).centerCrop().into(imageView);
 
 
         Calendar cal = Calendar.getInstance();

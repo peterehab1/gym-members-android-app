@@ -136,7 +136,6 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
                             final Map<String,Object> taskMap = new HashMap<String,Object>();
 
                             taskMap.put("name", userName.getText().toString());
-                            taskMap.put("image", mUserAvatarURI);
 
                             mRef.updateChildren(taskMap);
                             Toast.makeText(UpdateUserInfoActivity.this, "تم تحديث بيانات العضو", Toast.LENGTH_SHORT).show();
@@ -185,7 +184,6 @@ public class UpdateUserInfoActivity extends AppCompatActivity {
                                     if (task.isSuccessful()) {
 
                                         final Uri downloadUri = task.getResult();
-                                        taskMap.put("name", userName.getText().toString());
                                         taskMap.put("image", downloadUri.toString());
                                         mRef.updateChildren(taskMap);
 

@@ -139,6 +139,8 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
         final Users data = listdata.get(i);
         arrList = new ArrayList<>();
 
+
+
         for (int j = 0; j <= listdata.size()-1; j++){
             arrList.add(listdata.get(j).getName());
         }
@@ -312,6 +314,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
 
 
 
+
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             user_name = (TextView) itemView.findViewById(R.id.user_name_edit_text);
@@ -322,6 +325,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
             notesSection = itemView.findViewById(R.id.notes_section);
             userImage = itemView.findViewById(R.id.user_image);
             updateNotes = itemView.findViewById(R.id.update_notes);
+
 
         }
     }
