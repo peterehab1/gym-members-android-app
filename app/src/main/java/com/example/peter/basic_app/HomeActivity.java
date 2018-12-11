@@ -45,7 +45,8 @@ public class HomeActivity extends AppCompatActivity {
     private TextView warningsCount;
     private TextView errorsCount;
     private List<Users> list;
-    private FloatingActionButton fab;
+    private com.github.clans.fab.FloatingActionButton fab;
+    private com.github.clans.fab.FloatingActionButton fab2;
 
     private View lilView;
     private TextView connectionStatus;
@@ -61,6 +62,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private Button clearBtn;
 
+    static String updateLink;
+    static String updateVersion;
+
     String TAG = "getDate";
 
     @Override
@@ -70,15 +74,57 @@ public class HomeActivity extends AppCompatActivity {
 
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
+        DatabaseReference mRef = FirebaseDatabase.getInstance().getReference().child("Versions");
+
+        //Check for updates
+        final DatabaseReference updatedAppLink = mRef.child("200").child("link");
+        DatabaseReference updatedAppVersion = mRef.child("200").child("version");
+
+        updatedAppLink.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                updateLink = dataSnapshot.getValue(String.class);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        updatedAppVersion.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                updateVersion = dataSnapshot.getValue(String.class);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
 
         // initialise your views
-        searchWord = (EditText) findViewById(R.id.search_word);
-        searchList = (RecyclerView) findViewById(R.id.search_list);
-        warningsCount = (TextView) findViewById(R.id.warnings_count);
+        searchWord = findViewById(R.id.search_word);
+        searchList = findViewById(R.id.search_list);
+        warningsCount = findViewById(R.id.warnings_count);
         errorsCount = findViewById(R.id.errors_count);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference().child("Users");
-        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab = findViewById(R.id.fab);
+        fab2 = findViewById(R.id.fab2);
+
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(getApplicationContext(), UpdateAppActivity.class);
+                startActivity(i);
+            }
+        });
+
 
         clearBtn = findViewById(R.id.clear_btn);
         clearBtn.setOnClickListener(new View.OnClickListener() {
@@ -209,6 +255,8 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+
+
     public void getMyUsers(){
         mDatabaseRef.addValueEventListener(new ValueEventListener() {
 
@@ -218,18 +266,16 @@ public class HomeActivity extends AppCompatActivity {
                 oneWeekLeftMembers = new ArrayList<>();
                 noWeekLeftMembers = new ArrayList<>();
 
-
-                StringBuffer stringBuffer = new StringBuffer();
-
                 for (DataSnapshot dataSnapshot1: dataSnapshot.getChildren()){
                     Users users = dataSnapshot1.getValue(Users.class);
                     Users usersList = new Users();
+
 
                     String name = users.getName();
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
                     String image = users.getImage();
-                    //String notes = users.getNotes();
+                    String notes = users.getNotes();
                     String key = dataSnapshot1.getKey();
 
                     String startDate = users.getStartdate();
@@ -245,7 +291,7 @@ public class HomeActivity extends AppCompatActivity {
                     usersList.setName(name);
                     usersList.setMembership(membership);
                     usersList.setStartdate(startdate);
-                    //usersList.setNotes(notes);
+                    usersList.setNotes(notes);
                     usersList.setKey(key);
                     usersList.setImage(image);
 
@@ -316,7 +362,7 @@ public class HomeActivity extends AppCompatActivity {
                     String membership = users.getMembership();
                     String startdate = users.getStartdate();
                     String key = dataSnapshot1.getKey();
-                    //String notes = users.getNotes();
+                    String notes = users.getNotes();
                     String image = users.getImage();
 
                     usersList.setName(name);
@@ -324,7 +370,7 @@ public class HomeActivity extends AppCompatActivity {
                     usersList.setStartdate(startdate);
                     usersList.setImage(image);
                     usersList.setKey(key);
-                    //usersList.setNotes(notes);
+                    usersList.setNotes(notes);
 
                     list.add(usersList);
 

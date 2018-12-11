@@ -26,6 +26,7 @@ import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +50,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     StorageReference mStorageRef;
     Context context;
     ImageView imageIbUpdateDialog;
+    static ArrayList<String> arrList;
 
 
 
@@ -70,20 +72,22 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
     @Override
     public void onBindViewHolder(@NonNull final RecyclerviewAdapter.MyViewHolder myViewHolder, int i) {
         final Users data = listdata.get(i);
+        arrList = new ArrayList<>();
+
+        for (int j = 0; j <= listdata.size()-1; j++){
+            arrList.add(listdata.get(j).getName());
+        }
+
         myViewHolder.user_name.setText(data.getName());
         myViewHolder.user_membership.setText(" نظام الأشتراك : " + getMembershipFromFirebaseDatabase(data.getMembership()));
-        if (data.getImage() == null){
-            Picasso.get().load("https://firebasestorage.googleapis.com/v0/b/test-project-798ce.appspot.com/o/Unknown_avatar.png?alt=media&token=263bc75c-cffe-4a48-8339-b4dcf6250054").fit().transform(new CircleTransform()).centerCrop().into(myViewHolder.userImage);
-        }else{
-            Picasso.get().load(data.getImage()).fit().transform(new CircleTransform()).centerCrop().into(myViewHolder.userImage);
-        }
-       /*
-       *  if (data.getNotes().matches("0")){
+        Picasso.get().load(data.getImage()).fit().transform(new CircleTransform()).centerCrop().into(myViewHolder.userImage);
+
+       if (data.getNotes().matches("0")){
             myViewHolder.notesSection.setText("لا يوجد ملاحظات");
         }else {
             myViewHolder.notesSection.setText(" ملاحظات : " + String.valueOf(data.getNotes()));
         }
-        */
+
 
         //Font
         Typeface typeface = Typeface.createFromAsset(context.getAssets(), "fonts/Questv1-Bold.otf");
@@ -134,6 +138,7 @@ public class RecyclerviewAdapter extends RecyclerView.Adapter<RecyclerviewAdapte
                 intent.putExtra("childKey", data.getKey());
                 intent.putExtra("userName", data.getName());
                 intent.putExtra("userAvatar", data.getImage());
+                intent.putStringArrayListExtra("usersNamesArr", arrList);
                 v.getContext().startActivity(intent);
             }
         });

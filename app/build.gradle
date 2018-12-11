@@ -6,9 +6,9 @@ android {
         applicationId "com.example.peter.basic_app"
         minSdkVersion 15
         targetSdkVersion 28
-        versionCode 1
+        versionCode 2
         multiDexEnabled true
-        versionName "1.0"
+        versionName "2.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -36,13 +36,15 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     implementation 'com.google.firebase:firebase-auth:16.0.1'
     implementation 'com.google.android.gms:play-services-auth:16.0.0'
-    // FirebaseUI for Firebase Realtime Database
+
+    implementation 'com.github.clans:fab:1.6.4'
     implementation 'com.firebaseui:firebase-ui-database:3.3.1'
 
     implementation 'com.google.firebase:firebase-storage:16.0.1'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-
+    implementation 'com.google.firebase:firebase-messaging:17.0.0'
+    implementation 'com.google.firebase:firebase-config:16.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

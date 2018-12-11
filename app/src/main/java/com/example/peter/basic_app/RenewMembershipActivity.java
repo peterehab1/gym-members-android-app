@@ -123,6 +123,7 @@ public class RenewMembershipActivity extends AppCompatActivity {
 
                 // find the radiobutton by returned id
                 radioButton1 = (RadioButton) findViewById(selectedId);
+
                 if (!radioButton1.getText().toString().isEmpty()){
                     mRef = FirebaseDatabase.getInstance().getReference().child("Users").child(childKey);
                     Map<String,Object> taskMap = new HashMap<String,Object>();
